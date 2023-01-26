@@ -869,6 +869,21 @@ namespace PredatorPrey
         {
             return ReproductionRate;
         }
+        public override void CalculateNewAge()
+        {
+            base.CalculateNewAge();
+            if (Gender == Genders.Male)
+            {
+                ProbabilityOfDeathOtherCauses += 0.5*(ProbabilityOfDeathOtherCauses);
+            }
+            else
+            {
+                if (Age >= 2)
+                {
+                    ProbabilityOfDeathOtherCauses += 0.05;
+                }
+            }
+        }
     }
     
 }
