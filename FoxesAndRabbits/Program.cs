@@ -62,11 +62,13 @@ namespace PredatorPrey
     {
         public Fox Fox;
         public Warren Warren;
+        public char LandType = 'L';
 
-        public Location()
+        public Location(char landType)
         {
             Fox = null;
             Warren = null;
+            LandType = landType;
         }
     }
 
@@ -262,11 +264,21 @@ namespace PredatorPrey
 
         private void CreateLandscapeAndAnimals(int InitialWarrenCount, int InitialFoxCount, bool FixedInitialLocations)
         {
+            char landtype;
+
             for (int x = 0; x < LandscapeSize; x++)
             {
                 for (int y = 0; y < LandscapeSize; y++)
                 {
-                    Landscape[x, y] = new Location();
+                    if (y == 2 || x == 5)
+                    {
+                        landtype = 'R';
+                    }
+                    else
+                    {
+                        landtype = 'L';
+                    }
+                    Landscape[x, y] = new Location(landtype);
                 }
             }
             if (FixedInitialLocations)
@@ -407,11 +419,27 @@ namespace PredatorPrey
                         {
                             Console.Write(" ");
                         }
-                        Console.Write(Landscape[x, y].Warren.GetRabbitCount());
+                        if (x == 5 || y == 2)
+                        {
+                            Console.Write(Landscape[x, y].Warren.GetRabbitCount() + "R");
+                        }
+                        else
+                        {
+                            Console.Write(Landscape[x, y].Warren.GetRabbitCount() + "L");
+
+                        }
+
                     }
                     else
                     {
-                        Console.Write("  ");
+                        if (x == 5 || y == 2)
+                        {
+                            Console.Write(" R");
+                        }
+                        else
+                        {
+                            Console.Write(" L");
+                        }
                     }
                     if (Landscape[x, y].Fox != null)
                     {
