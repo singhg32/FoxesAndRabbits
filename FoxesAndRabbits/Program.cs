@@ -5,6 +5,7 @@
 
 
 using System;
+using System.Runtime.CompilerServices;
 
 namespace PredatorPrey
 {
@@ -82,7 +83,24 @@ namespace PredatorPrey
         private int LandscapeSize;
         private int Variability;
         private static Random Rnd = new Random();
-
+        private bool CheckIfPathCrossesRiver(int startx, int starty, int endx, int endy)
+        {
+            for (int i = startx; i < endx; i++)
+            {
+                if (i == 5)
+                {
+                    return true;
+                }
+            }
+            for (int j = starty; j < endy; j++)
+            {
+                if (j == 2)
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
         public Simulation(int LandscapeSize, int InitialWarrenCount, int InitialFoxCount, int Variability, bool FixedInitialLocations)
         {
             int menuOption;
@@ -311,28 +329,40 @@ namespace PredatorPrey
 
         private void CreateNewWarren()
         {
-            int x, y;
-            do
-            {
-                x = Rnd.Next(0, LandscapeSize);
-                y = Rnd.Next(0, LandscapeSize);
-            } while (Landscape[x, y].Warren != null);
-            if (ShowDetail)
-            {
-                Console.WriteLine("New Warren at (" + x + "," + y + ")");
-            }
-            Landscape[x, y].Warren = new Warren(Variability);
-            WarrenCount++;
+                int x, y;
+            bool valid = true;
+                do
+                {
+                    x = Rnd.Next(0, LandscapeSize);
+                    y = Rnd.Next(0, LandscapeSize);
+                    if (x == 5 || y == 2)
+                {
+                    valid = false;
+                }
+                } while (Landscape[x, y].Warren != null || valid == false);
+
+                if (ShowDetail)
+                {
+                    Console.WriteLine("New Warren at (" + x + "," + y + ")");
+                }
+                Landscape[x, y].Warren = new Warren(Variability);
+                WarrenCount++;
+            
         }
 
         private void CreateNewFox()
         {
             int x, y;
+            bool valid = true;
             do
             {
                 x = Rnd.Next(0, LandscapeSize);
                 y = Rnd.Next(0, LandscapeSize);
-            } while (Landscape[x, y].Fox != null);
+                if (x == 5 || y == 2)
+                {
+                    valid = false;
+                }
+            } while (Landscape[x, y].Fox != null || valid == false);
             if (ShowDetail)
             {
                 Console.WriteLine("  New Fox at (" + x + "," + y + ")");
@@ -354,25 +384,28 @@ namespace PredatorPrey
                 {
                     if (Landscape[FoxX, FoxY].Fox != null)
                     {
-                        Dist = DistanceBetween(FoxX, FoxY, WarrenX, WarrenY);
-                        if (Dist <= 3.5)
+                        if (CheckIfPathCrossesRiver(FoxX, FoxY, WarrenX, WarrenY) == false)
                         {
-                            PercentToEat = 20;
-                        }
-                        else if (Dist <= 7)
-                        {
-                            PercentToEat = 10;
-                        }
-                        else
-                        {
-                            PercentToEat = 0;
-                        }
-                        RabbitsToEat = (int)Math.Round((double)(PercentToEat * RabbitCountAtStartOfPeriod / 100.0));
-                        FoodConsumed = Landscape[WarrenX, WarrenY].Warren.EatRabbits(RabbitsToEat);
-                        Landscape[FoxX, FoxY].Fox.GiveFood(FoodConsumed);
-                        if (ShowDetail)
-                        {
-                            Console.WriteLine("  " + FoodConsumed + " rabbits eaten by fox at (" + FoxX + "," + FoxY + ").");
+                            Dist = DistanceBetween(FoxX, FoxY, WarrenX, WarrenY);
+                            if (Dist <= 3.5)
+                            {
+                                PercentToEat = 20;
+                            }
+                            else if (Dist <= 7)
+                            {
+                                PercentToEat = 10;
+                            }
+                            else
+                            {
+                                PercentToEat = 0;
+                            }
+                            RabbitsToEat = (int)Math.Round((double)(PercentToEat * RabbitCountAtStartOfPeriod / 100.0));
+                            FoodConsumed = Landscape[WarrenX, WarrenY].Warren.EatRabbits(RabbitsToEat);
+                            Landscape[FoxX, FoxY].Fox.GiveFood(FoodConsumed);
+                            if (ShowDetail)
+                            {
+                                Console.WriteLine("  " + FoodConsumed + " rabbits eaten by fox at (" + FoxX + "," + FoxY + ").");
+                            }
                         }
                     }
                 }
@@ -447,13 +480,17 @@ namespace PredatorPrey
                     }
                     else
                     {
-                        Console.Write(" ");
+                        if (Landscape[x, y].Warren == null)
+                        {
+                            Console.Write(" ");
+                        }
                     }
                     Console.Write("|");
                 }
                 Console.WriteLine();
             }
         }
+        
     }
 
     class Warren
