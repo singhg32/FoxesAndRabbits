@@ -85,21 +85,46 @@ namespace PredatorPrey
         private static Random Rnd = new Random();
         private bool CheckIfPathCrossesRiver(int startx, int starty, int endx, int endy)
         {
-            for (int i = startx; i < endx; i++)
-            {
-                if (i == 5)
+            if (startx < endx){
+                for (int i = startx; i < endx; i++)
                 {
-                    return true;
+                    if (i == 5)
+                    {
+                        return true;
+                    }
                 }
-            }
-            for (int j = starty; j < endy; j++)
-            {
-                if (j == 2)
+                for (int j = starty; j < endy; j++)
                 {
-                    return true;
+                    if (j == 2)
+                    {
+                        return true;
+                    }
                 }
+                return false;
             }
-            return false;
+            else if (startx == endx)
+            {
+                return false;
+            }
+            else
+            {
+                for (int i = endx; i < startx; i++)
+                {
+                    if (i == 5)
+                    {
+                        return true;
+                    }
+                }
+                for (int j = endy; j < starty; j++)
+                {
+                    if (j == 2)
+                    {
+                        return true;
+                    }
+                }
+                return false;
+
+            }
         }
         public Simulation(int LandscapeSize, int InitialWarrenCount, int InitialFoxCount, int Variability, bool FixedInitialLocations)
         {
